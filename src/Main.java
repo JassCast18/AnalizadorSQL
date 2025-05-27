@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        String input = "SELECT * FROM estudiantes";
+        String input = "SELECT NOMBRE, TELEFONO FROM estudiantes WHERE EDAD >=19 ORDER BY TELEFONO ASC";
 
         LexicalAnalyzer lexer = new LexicalAnalyzer(input);
         if (!lexer.tokenize())

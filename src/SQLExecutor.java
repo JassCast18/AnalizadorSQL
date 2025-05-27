@@ -16,7 +16,6 @@ public class SQLExecutor {
                 return;
             }
 
-            // Usa espacios como separador para encabezados y valores
             String[] headers = headerLine.trim().split("\\s+");
             List<Map<String, String>> records = new ArrayList<>();
 
@@ -26,13 +25,8 @@ public class SQLExecutor {
                 if (line.trim().isEmpty())
                     continue;
                 String[] values = line.trim().split("\\s+");
-
-                // Si la cantidad de columnas no coincide, ignora la fila o lanza advertencia
-                if (values.length != headers.length) {
-                    System.out.println("⚠️ Fila ignorada por cantidad incorrecta de columnas: " + line);
+                if (values.length != headers.length)
                     continue;
-                }
-
                 Map<String, String> row = new HashMap<>();
                 for (int i = 0; i < headers.length; i++) {
                     row.put(headers[i], values[i]);
@@ -40,40 +34,47 @@ public class SQLExecutor {
                 records.add(row);
             }
 
-            // Aplicar condición WHERE
-            String[] condParts = condition.split(" ");
-            String condCol = condParts[0];
-            String operator = condParts[1];
-            String condVal = condParts[2];
+            // Filtrar por condición SOLO SI EXISTE WHERE
+            List<Map<String, String>> filtered = new ArrayList<>(records);
+            if (condition != null && !condition.isBlank()) {
+                String[] condParts = condition.split(" ");
+                if (condParts.length == 3) {
+                    String condCol = condParts[0];
+                    String operator = condParts[1];
+                    String condVal = condParts[2];
 
-            List<Map<String, String>> filtered = new ArrayList<>();
-            for (Map<String, String> row : records) {
-                String value = row.get(condCol);
-                if (value == null) {
-                    System.out.println("❌ Error: columna '" + condCol + "' no existe en los datos.");
-                    continue;
-                }
-                if (compare(value, condVal, operator)) {
-                    filtered.add(row);
+                    filtered = new ArrayList<>();
+                    for (Map<String, String> row : records) {
+                        String value = row.get(condCol);
+                        if (value == null)
+                            continue;
+                        if (compare(value, condVal, operator)) {
+                            filtered.add(row);
+                        }
+                    }
+                } else {
+                    System.out.println("⚠️ Condición WHERE ignorada porque está incompleta.");
                 }
             }
 
-            // Ordenar
-            filtered.sort((a, b) -> {
-                String val1 = a.get(orderBy);
-                String val2 = b.get(orderBy);
-                if (val1 == null || val2 == null) {
-                    System.out.println("❌ Error: valor nulo al ordenar por '" + orderBy + "'.");
-                    return 0;
-                }
-                int cmp;
-                try {
-                    cmp = Integer.compare(Integer.parseInt(val1), Integer.parseInt(val2));
-                } catch (NumberFormatException e) {
-                    cmp = val1.compareTo(val2);
-                }
-                return ascending ? cmp : -cmp;
-            });
+            // Ordenar SOLO SI HAY ORDER BY
+            if (orderBy != null && !orderBy.isBlank()) {
+                filtered.sort((a, b) -> {
+                    String val1 = a.get(orderBy);
+                    String val2 = b.get(orderBy);
+                    if (val1 == null || val2 == null) {
+                        System.out.println("❌ Error: valor nulo al ordenar por '" + orderBy + "'.");
+                        return 0;
+                    }
+                    int cmp;
+                    try {
+                        cmp = Integer.compare(Integer.parseInt(val1), Integer.parseInt(val2));
+                    } catch (NumberFormatException e) {
+                        cmp = val1.compareTo(val2);
+                    }
+                    return ascending ? cmp : -cmp;
+                });
+            }
 
             // Mostrar columnas
             String[] colList = selectedCols.equals("*") ? headers : selectedCols.split(",");

@@ -18,7 +18,14 @@ public class LexicalAnalyzer {
     }
 
     public boolean tokenize() {
-        String[] parts = input.split("\\s+|(?=\\W)|(?<=\\W)");
+        // Preprocesar operadores de dos caracteres para que queden como tokens únicos
+        String tmp = input;
+        String[] multiOps = { ">=", "<=", "<>", "!=", "==" };
+        for (String op : multiOps) {
+            tmp = tmp.replace(op, " " + op + " ");
+        }
+        // Ahora separar por espacios y símbolos
+        String[] parts = tmp.split("\\s+|(?=\\W)|(?<=\\W)");
         for (String part : parts) {
             if (part.isBlank())
                 continue;
