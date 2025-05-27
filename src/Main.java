@@ -1,21 +1,22 @@
 public class Main {
     public static void main(String[] args) {
-        String input = "SELECT NOMBRE, TELEFONO FROM estudiantes WHERE EDAD >= 19 ORDER BY TELEFONO ASC";
+        String input = "SELECT * FROM estudiantes";
 
         LexicalAnalyzer lexer = new LexicalAnalyzer(input);
-        if (!lexer.tokenize())
+        if (!lexer.tokenize()) // Enviar al analizador léxico
             return;
 
         Parser parser = new Parser(lexer.getTokens());
-        if (!parser.parse())
+        if (!parser.parse()) // Enviar al analizador sintáctico
             return;
 
         SemanticAnalyzer semantic = new SemanticAnalyzer(parser);
-        if (!semantic.validate())
+        if (!semantic.validate()) // Enviar al analizador semántico
             return;
 
-        SQLExecutor executor = new SQLExecutor(semantic.getDataFilePath());
+        SQLExecutor executor = new SQLExecutor(semantic.getDataFilePath()); // Enviar al ejecutor SQL (compilador)
         String selectedCols = String.join(",", parser.getColumns());
-        executor.execute(selectedCols, parser.getCondition(), parser.getOrderBy(), parser.isAscending());
+        executor.execute(selectedCols, parser.getCondition(), parser.getOrderBy(), parser.isAscending(),
+                parser.isDistinct());
     }
 }

@@ -18,27 +18,19 @@ public class LexicalAnalyzer {
     }
 
     public boolean tokenize() {
-        // Preprocesar operadores para que se separen bien, agregando espacios alrededor
+        // Preprocesar operadores de dos caracteres para que queden como tokens únicos
         String tmp = input;
-
-        // Reemplazar primero operadores dobles
         String[] multiOps = { ">=", "<=", "<>", "!=", "==" };
         for (String op : multiOps) {
             tmp = tmp.replace(op, " " + op + " ");
         }
 
-        // Luego operadores simples, sin afectar los que ya tienen espacio
-        String[] singleOps = { "=", "<", ">" };
-        for (String op : singleOps) {
-            tmp = tmp.replace(op, " " + op + " ");
-        }
-
-        // También asegurar separación de comas y asteriscos
         tmp = tmp.replace(",", " , ");
         tmp = tmp.replace("*", " * ");
 
         // Separar por uno o más espacios
         String[] parts = tmp.trim().split("\\s+");
+
         for (String part : parts) {
             if (part.isBlank())
                 continue;

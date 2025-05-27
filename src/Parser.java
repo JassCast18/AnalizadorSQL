@@ -8,6 +8,7 @@ public class Parser {
     private String condition = "";
     private String orderBy = "";
     private boolean ascending = true;
+    private boolean distinct = false;
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
@@ -18,8 +19,10 @@ public class Parser {
             return error("Falta SELECT");
 
         // ALL o DISTINCT (opcional)
-        if (match(Token.Type.KEYWORD, "ALL") || match(Token.Type.KEYWORD, "DISTINCT")) {
-            // aceptado pero no se usa en esta versión
+        if (match(Token.Type.KEYWORD, "ALL")) {
+            distinct = false;
+        } else if (match(Token.Type.KEYWORD, "DISTINCT")) {
+            distinct = true;
         }
 
         // * o lista de columnas
@@ -142,5 +145,9 @@ public class Parser {
 
     public boolean isAscending() {
         return ascending;
+    }
+
+    public boolean isDistinct() {
+        return distinct;
     }
 }

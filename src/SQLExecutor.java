@@ -8,7 +8,7 @@ public class SQLExecutor {
         this.filePath = filePath;
     }
 
-    public void execute(String selectedCols, String condition, String orderBy, boolean ascending) {
+    public void execute(String selectedCols, String condition, String orderBy, boolean ascending, boolean distinct) {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String headerLine = reader.readLine();
             if (headerLine == null) {
@@ -78,7 +78,21 @@ public class SQLExecutor {
 
             // Mostrar columnas
             String[] colList = selectedCols.equals("*") ? headers : selectedCols.split(",");
-
+            if (distinct) {
+                Set<String> uniqueRows = new LinkedHashSet<>();
+                List<Map<String, String>> distinctFiltered = new ArrayList<>();
+                for (Map<String, String> row : filtered) {
+                    // crea un string concatenando solo los valores de las columnas seleccionadas
+                    StringBuilder key = new StringBuilder();
+                    for (String col : colList) {
+                        key.append(row.getOrDefault(col, "NULL")).append("|"); // separador único
+                    }
+                    if (uniqueRows.add(key.toString())) {
+                        distinctFiltered.add(row);
+                    }
+                }
+                filtered = distinctFiltered;
+            }
             // Imprimir resultados
             System.out.println("\n📊 Resultados:");
             for (String col : colList)
