@@ -43,17 +43,21 @@ public class SemanticAnalyzer {
                 }
             }
 
-            // Verificar columna de condición WHERE
-            String condCol = condition.split(" ")[0];
-            if (!tableColumns.contains(condCol)) {
-                System.out.println("❌ Error semántico: Columna en condición '" + condCol + "' no existe.");
-                return false;
+            // ✅ Verificar columna de condición WHERE (solo si hay condición)
+            if (!condition.isEmpty()) {
+                String condCol = condition.split(" ")[0];
+                if (!tableColumns.contains(condCol)) {
+                    System.out.println("❌ Error semántico: Columna en condición '" + condCol + "' no existe.");
+                    return false;
+                }
             }
 
-            // Verificar columna de ORDER BY
-            if (!tableColumns.contains(orderBy)) {
-                System.out.println("❌ Error semántico: Columna en ORDER BY '" + orderBy + "' no existe.");
-                return false;
+            // ✅ Verificar columna de ORDER BY (solo si se usó ORDER BY)
+            if (!orderBy.isEmpty()) {
+                if (!tableColumns.contains(orderBy)) {
+                    System.out.println("❌ Error semántico: Columna en ORDER BY '" + orderBy + "' no existe.");
+                    return false;
+                }
             }
 
             System.out.println("✔️ Semántica válida.");

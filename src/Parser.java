@@ -37,25 +37,28 @@ public class Parser {
 
         tableName = previous().getValue();
 
-        if (!match(Token.Type.KEYWORD, "WHERE"))
-            return error("Falta WHERE");
+        // WHERE (opcional)
+        if (match(Token.Type.KEYWORD, "WHERE")) {
+            if (!parseCondition())
+                return false;
+        }
 
-        if (!parseCondition())
-            return false;
+        // ORDER BY (opcional)
+        if (match(Token.Type.KEYWORD, "ORDER")) {
+            if (!match(Token.Type.KEYWORD, "BY"))
+                return error("Falta BY después de ORDER");
 
-        if (!match(Token.Type.KEYWORD, "ORDER"))
-            return error("Falta ORDER");
-        if (!match(Token.Type.KEYWORD, "BY"))
-            return error("Falta BY");
+            if (!match(Token.Type.IDENTIFIER))
+                return error("Falta columna para ORDER BY");
 
-        if (!match(Token.Type.IDENTIFIER))
-            return error("Falta columna para ORDER BY");
-        orderBy = previous().getValue();
+            orderBy = previous().getValue();
 
-        if (match(Token.Type.KEYWORD, "DESC"))
-            ascending = false;
-        else
-            match(Token.Type.KEYWORD, "ASC"); // opcional
+            // ASC o DESC (ambos opcionales, ASC por defecto)
+            if (match(Token.Type.KEYWORD, "DESC"))
+                ascending = false;
+            else
+                match(Token.Type.KEYWORD, "ASC"); // opcional, ASC por defecto
+        }
 
         System.out.println("✔️ Sintaxis válida.");
         return true;
