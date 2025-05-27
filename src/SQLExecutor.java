@@ -16,13 +16,22 @@ public class SQLExecutor {
                 return;
             }
 
-            String[] headers = headerLine.split(",");
+            // Usa espacios como separador para encabezados y valores
+            String[] headers = headerLine.trim().split("\\s+");
             List<Map<String, String>> records = new ArrayList<>();
 
             // Leer todos los registros
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] values = line.trim().split("[,\\s]+");
+                if (line.trim().isEmpty())
+                    continue;
+                String[] values = line.trim().split("\\s+");
+
+                // Si la cantidad de columnas no coincide, ignora la fila o lanza advertencia
+                if (values.length != headers.length) {
+                    System.out.println("⚠️ Fila ignorada por cantidad incorrecta de columnas: " + line);
+                    continue;
+                }
 
                 Map<String, String> row = new HashMap<>();
                 for (int i = 0; i < headers.length; i++) {
@@ -40,6 +49,10 @@ public class SQLExecutor {
             List<Map<String, String>> filtered = new ArrayList<>();
             for (Map<String, String> row : records) {
                 String value = row.get(condCol);
+                if (value == null) {
+                    System.out.println("❌ Error: columna '" + condCol + "' no existe en los datos.");
+                    continue;
+                }
                 if (compare(value, condVal, operator)) {
                     filtered.add(row);
                 }
@@ -49,6 +62,10 @@ public class SQLExecutor {
             filtered.sort((a, b) -> {
                 String val1 = a.get(orderBy);
                 String val2 = b.get(orderBy);
+                if (val1 == null || val2 == null) {
+                    System.out.println("❌ Error: valor nulo al ordenar por '" + orderBy + "'.");
+                    return 0;
+                }
                 int cmp;
                 try {
                     cmp = Integer.compare(Integer.parseInt(val1), Integer.parseInt(val2));
@@ -69,7 +86,8 @@ public class SQLExecutor {
 
             for (Map<String, String> row : filtered) {
                 for (String col : colList) {
-                    System.out.print(row.get(col) + "\t");
+                    String val = row.get(col);
+                    System.out.print((val != null ? val : "NULL") + "\t");
                 }
                 System.out.println();
             }
@@ -80,6 +98,8 @@ public class SQLExecutor {
     }
 
     private boolean compare(String val1, String val2, String op) {
+        if (val1 == null || val2 == null)
+            return false;
         try {
             int a = Integer.parseInt(val1);
             int b = Integer.parseInt(val2);
