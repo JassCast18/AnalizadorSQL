@@ -22,7 +22,8 @@ public class SQLExecutor {
             // Leer todos los registros
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
+                String[] values = line.trim().split("[,\\s]+");
+
                 Map<String, String> row = new HashMap<>();
                 for (int i = 0; i < headers.length; i++) {
                     row.put(headers[i], values[i]);

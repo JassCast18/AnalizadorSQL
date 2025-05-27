@@ -1,0 +1,6 @@
+NOMBRE APELLIDO TELEFONO EDAD
+Hernan Vargas 12345678 17
+Hugo Corado 87654321 18
+Evelyn Cardenas 11223344 19
+Lamine Yamal 99887766 21
+Víctor Ochoa 44553311 22

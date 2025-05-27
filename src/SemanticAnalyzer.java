@@ -17,10 +17,7 @@ public class SemanticAnalyzer {
     }
 
     public boolean validate() {
-        // Verificar si la tabla existe (archivo)
-        File file = new File(
-                "A:/caste/Documents/Jaser/Tareas UMG/7mo Semestre/CompiladoresProyecto/ProyectCompiladores/src/empleados.txt");
-
+        File file = new File(tableName + ".txt");
         if (!file.exists()) {
             System.out.println("❌ Error semántico: Tabla '" + tableName + "' no existe (archivo no encontrado)");
             return false;
@@ -34,12 +31,12 @@ public class SemanticAnalyzer {
                 return false;
             }
 
-            tableColumns = Arrays.asList(header.split(","));
+            tableColumns = Arrays.asList(header.trim().split("[,\\s]+"));
 
             // Verificar columnas seleccionadas
             if (!columns.get(0).equals("*")) {
                 for (String col : columns) {
-                    if (!tableColumns.contains(col)) {
+                    if (tableColumns.stream().noneMatch(h -> h.equalsIgnoreCase(col))) {
                         System.out.println("❌ Error semántico: Columna '" + col + "' no existe.");
                         return false;
                     }
