@@ -1,3 +1,5 @@
+package main.java.Compilacion;
+
 public class Token {
     public enum Type {
         KEYWORD, IDENTIFIER, OPERATOR, SYMBOL, NUMBER, COMMA, ASTERISK, ERROR
